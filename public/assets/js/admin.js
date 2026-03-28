@@ -4,6 +4,7 @@
 
     // CSRF token for AJAX requests
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const basePath = window.GP_BASE_PATH || '';
 
     // Toggle sidebar children
     document.querySelectorAll('.nav-item.has-children > .nav-link').forEach(link => {
@@ -92,7 +93,7 @@
             const formData = new FormData(editorForm);
             formData.append('_autosave', '1');
 
-            fetch('/api/posts/autosave', {
+            fetch(basePath + '/api/posts/autosave', {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': csrfToken },
                 body: formData
@@ -196,7 +197,7 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            fetch('/api/media/upload', {
+            fetch(basePath + '/api/media/upload', {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': csrfToken },
                 body: formData

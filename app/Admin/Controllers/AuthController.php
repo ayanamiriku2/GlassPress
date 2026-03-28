@@ -31,6 +31,7 @@ class AuthController
             'success' => isset($_GET['installed']) ? 'GlassPress has been installed successfully! Please log in.' : '',
             'redirect' => $_GET['redirect'] ?? '',
             'siteName' => $this->app->getService('settings')->get('site_title', 'GlassPress'),
+            'app' => $this->app,
         ];
         unset($_SESSION['login_error']);
 
@@ -88,6 +89,7 @@ class AuthController
             'message' => $_SESSION['forgot_message'] ?? '',
             'error' => $_SESSION['forgot_error'] ?? '',
             'siteName' => $this->app->getService('settings')->get('site_title', 'GlassPress'),
+            'app' => $this->app,
         ];
         unset($_SESSION['forgot_message'], $_SESSION['forgot_error']);
 

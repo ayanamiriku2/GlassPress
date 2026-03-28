@@ -67,6 +67,9 @@ class Application
             return;
         }
 
+        // Publish any scheduled posts that are due
+        $this->publishScheduledPosts();
+
         // Load router and dispatch
         $router = $this->getService('router');
         
@@ -262,5 +265,60 @@ class Application
     {
         $adminPath = 'admin' . ($path ? '/' . ltrim($path, '/') : '');
         return $this->getSiteUrl($adminPath);
+    }
+
+    /**
+     * Get the URL for a public asset (CSS, JS, images).
+     */
+    public function getAssetUrl(string $path = ''): string
+    {
+        return $this->getSiteUrl('public/assets/' . ltrim($path, '/'));
+    }
+
+    /**
+     * Get the API base URL.
+     */
+    public function getApiUrl(string $path = ''): string
+    {
+        return $this->getSiteUrl('api/' . ltrim($path, '/'));
+    }
+
+    /**
+     * Get the upload URL for a given file path.
+     */
+    public function getUploadUrl(string $path = ''): string
+    {
+        return $this->getSiteUrl('uploads/' . ltrim($path, '/'));
+    }
+
+    /**
+     * Get the base path (subfolder prefix) without host.
+     * E.g. '' for root install, '/mysite' for subfolder install.
+     */
+    public function getBasePath(): string
+    {
+        return rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    }
+
+    /**
+     * Publish any scheduled posts whose publish time has passed.
+     * Called on every frontend request (lightweight query).
+     */
+    public function publishScheduledPosts(): void
+    {
+        try {
+            $db = $this->getService('db');
+            if (!$db) return;
+            $now = date('Y-m-d H:i:s');
+            $db->query(
+                sprintf(
+                    "UPDATE %s SET status = 'publish' WHERE status = 'scheduled' AND published_at IS NOT NULL AND published_at <= ?",
+                    $db->prefix('posts')
+                ),
+                [$now]
+            );
+        } catch (\Exception $e) {
+            // Silently fail - don't break the request
+        }
     }
 }

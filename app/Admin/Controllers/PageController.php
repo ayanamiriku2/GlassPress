@@ -109,10 +109,16 @@ class PageController extends AdminController
 
         $publishedAt = null;
         if ($status === 'publish') {
-            $publishedAt = date('Y-m-d H:i:s');
+            $publishedAt = !empty($_POST['published_at']) ? $_POST['published_at'] : date('Y-m-d H:i:s');
+        } elseif ($status === 'scheduled') {
+            $publishedAt = !empty($_POST['published_at']) ? $_POST['published_at'] : '';
+            if (empty($publishedAt) || strtotime($publishedAt) <= time()) {
+                $status = 'publish';
+                $publishedAt = date('Y-m-d H:i:s');
+            }
         }
 
-        if (in_array($status, ['publish']) && !$auth->hasCapability('publish_posts')) {
+        if (in_array($status, ['publish', 'scheduled']) && !$auth->hasCapability('publish_posts')) {
             $status = 'pending';
         }
 
@@ -209,7 +215,9 @@ class PageController extends AdminController
         $publishedAt = $post['published_at'];
 
         if ($status === 'publish' && !$publishedAt) {
-            $publishedAt = date('Y-m-d H:i:s');
+            $publishedAt = !empty($_POST['published_at']) ? $_POST['published_at'] : date('Y-m-d H:i:s');
+        } elseif ($status === 'scheduled') {
+            $publishedAt = !empty($_POST['published_at']) ? $_POST['published_at'] : '';
         }
 
         $db->update('posts', [
@@ -249,9 +257,17 @@ class PageController extends AdminController
         }
 
         if ($post['status'] === 'trash') {
-            $db->delete('seo_meta', "object_type = 'post' AND object_id = ?", [$postId]);
-            $db->delete('comments', 'post_id = ?', [$postId]);
-            $db->delete('posts', 'id = ?', [$postId]);
+            $db->beginTransaction();
+            try {
+                $db->delete('seo_meta', "object_type = 'post' AND object_id = ?", [$postId]);
+                $db->delete('comments', 'post_id = ?', [$postId]);
+                $db->delete('posts', 'id = ?', [$postId]);
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                $this->redirect($this->app->getAdminUrl('pages?status=trash'), 'Failed to delete page.', 'error');
+                return;
+            }
             $this->redirect($this->app->getAdminUrl('pages?status=trash'), 'Page permanently deleted.');
         } else {
             $db->update('posts', ['status' => 'trash', 'updated_at' => date('Y-m-d H:i:s')], 'id = ?', [$postId]);

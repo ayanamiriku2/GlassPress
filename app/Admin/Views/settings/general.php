@@ -79,6 +79,19 @@ $tabs = [
         </div>
 
         <div class="form-group">
+            <label>Time Format</label>
+            <select name="time_format" class="form-input">
+                <?php
+                $currentTimeFmt = $settings->get('time_format', 'g:i a');
+                $timeFormats = ['g:i a' => '1:30 pm', 'g:i A' => '1:30 PM', 'H:i' => '13:30'];
+                foreach ($timeFormats as $tf => $texample):
+                ?>
+                <option value="<?= $tf ?>" <?= $currentTimeFmt === $tf ? 'selected' : '' ?>><?= $texample ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label>Language</label>
             <select name="language" class="form-input">
                 <?php

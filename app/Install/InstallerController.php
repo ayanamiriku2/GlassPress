@@ -23,7 +23,8 @@ class InstallerController
     {
         // If already installed, block access
         if ($this->app->isInstalled()) {
-            header('Location: /');
+            $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+            header('Location: ' . ($basePath ?: '/'));
             exit;
         }
 
@@ -158,7 +159,8 @@ class InstallerController
 
             // 8. Redirect to login
             CSRF::regenerate();
-            header('Location: /admin/login?installed=1');
+            $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+            header('Location: ' . $basePath . '/admin/login?installed=1');
             exit;
 
         } catch (\Exception $e) {
@@ -422,7 +424,8 @@ PHP;
         // Don't store password in session
         unset($old['admin_password'], $old['db_password']);
         $_SESSION['install_old'] = $old;
-        header('Location: /');
+        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+        header('Location: ' . ($basePath ?: '/'));
         exit;
     }
 }

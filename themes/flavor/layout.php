@@ -57,8 +57,12 @@
 
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($siteName) ?> RSS" href="<?= $siteUrl ?>/feed">
 
-    <?php if ($settings->get('site_favicon')): ?>
-    <link rel="icon" href="<?= htmlspecialchars($settings->get('site_favicon')) ?>">
+    <?php $favicon = $settings->get('site_favicon', ''); if ($favicon):
+        $favExt = strtolower(pathinfo($favicon, PATHINFO_EXTENSION));
+        $favType = match($favExt) { 'png' => 'image/png', 'svg' => 'image/svg+xml', 'gif' => 'image/gif', 'jpg', 'jpeg' => 'image/jpeg', 'webp' => 'image/webp', default => 'image/x-icon' };
+    ?>
+    <link rel="icon" type="<?= $favType ?>" href="<?= htmlspecialchars($favicon) ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($favicon) ?>">
     <?php endif; ?>
 
     <link rel="stylesheet" href="<?= $siteUrl ?>/themes/flavor/assets/css/style.css">

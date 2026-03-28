@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Login - <?= htmlspecialchars($siteName) ?></title>
+    <?php $favicon = $app->getService('settings')->get('site_favicon', ''); if ($favicon):
+        $favExt = strtolower(pathinfo($favicon, PATHINFO_EXTENSION));
+        $favType = match($favExt) { 'png' => 'image/png', 'svg' => 'image/svg+xml', 'gif' => 'image/gif', 'jpg', 'jpeg' => 'image/jpeg', 'webp' => 'image/webp', default => 'image/x-icon' };
+    ?>
+    <link rel="icon" type="<?= $favType ?>" href="<?= htmlspecialchars($favicon) ?>">
+    <?php endif; ?>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -111,7 +117,7 @@
         <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="/admin/login">
+        <form method="POST" action="<?= $app->getAdminUrl('login') ?>">
             <?= $csrf_field ?>
             <?php if (!empty($redirect)): ?>
             <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect, ENT_QUOTES) ?>">
@@ -132,7 +138,7 @@
                     <input type="checkbox" name="remember">
                     <span>Remember me</span>
                 </label>
-                <a href="/admin/forgot-password">Forgot password?</a>
+                <a href="<?= $app->getAdminUrl('forgot-password') ?>">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn-login">Sign In</button>

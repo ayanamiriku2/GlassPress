@@ -3,6 +3,7 @@
     'use strict';
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const basePath = window.GP_BASE_PATH || '';
     let currentPage = 1;
     let hasMore = true;
     let selectedMedia = null;
@@ -39,7 +40,7 @@
             const empty = document.getElementById('media-empty');
             const more = document.getElementById('media-load-more');
 
-            fetch('/api/media/list?page=' + currentPage, {
+            fetch(basePath + '/api/media/list?page=' + currentPage, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(r => r.json())
@@ -160,7 +161,7 @@
                 formData.append('file', file);
                 formData.append('csrf_token', csrfToken);
 
-                fetch('/api/media/upload', {
+                fetch(basePath + '/api/media/upload', {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
                     body: formData

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Forgot Password - <?= htmlspecialchars($siteName) ?></title>
+    <?php $favicon = $app->getService('settings')->get('site_favicon', ''); if ($favicon):
+        $favExt = strtolower(pathinfo($favicon, PATHINFO_EXTENSION));
+        $favType = match($favExt) { 'png' => 'image/png', 'svg' => 'image/svg+xml', 'gif' => 'image/gif', 'jpg', 'jpeg' => 'image/jpeg', 'webp' => 'image/webp', default => 'image/x-icon' };
+    ?>
+    <link rel="icon" type="<?= $favType ?>" href="<?= htmlspecialchars($favicon) ?>">
+    <?php endif; ?>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root { --glass-bg: rgba(255,255,255,0.1); --glass-border: rgba(255,255,255,0.18); --primary: #6366f1; --text: #f1f5f9; --text-muted: #94a3b8; --input-bg: rgba(255,255,255,0.08); --input-border: rgba(255,255,255,0.15); }
@@ -43,7 +49,7 @@
         <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="/admin/forgot-password">
+        <form method="POST" action="<?= $app->getAdminUrl('forgot-password') ?>">
             <?= $csrf_field ?>
             <div class="form-group">
                 <label>Email Address</label>
@@ -53,7 +59,7 @@
         </form>
 
         <div class="back-link">
-            <a href="/admin/login">&larr; Back to login</a>
+            <a href="<?= $app->getAdminUrl('login') ?>">&larr; Back to login</a>
         </div>
     </div>
 </body>

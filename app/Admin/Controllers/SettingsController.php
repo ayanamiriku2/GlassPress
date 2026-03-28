@@ -80,7 +80,7 @@ class SettingsController extends AdminController
         $page = $_POST['settings_group'] ?? $_POST['_settings_page'] ?? 'general';
 
         // Get all POST fields except system fields
-        $ignore = ['csrf_token', '_settings_page', 'settings_group'];
+        $ignore = ['csrf_token', '_csrf_token', '_settings_page', 'settings_group'];
         foreach ($_POST as $key => $value) {
             if (in_array($key, $ignore)) continue;
 
@@ -154,7 +154,7 @@ class SettingsController extends AdminController
         $map = [
             'general' => [],
             'writing' => [],
-            'reading' => ['show_full_content'],
+            'reading' => [],
             'discussion' => ['comments_enabled', 'comment_moderation', 'comment_registration'],
             'media' => [],
             'permalinks' => [],

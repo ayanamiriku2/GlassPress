@@ -11,11 +11,11 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div class="form-group">
                 <label>Width (px)</label>
-                <input type="number" name="thumb_width" class="form-input" value="<?= (int) $settings->get('thumb_width', 150) ?>" min="50">
+                <input type="number" name="thumbnail_width" class="form-input" value="<?= (int) $settings->get('thumbnail_width', 150) ?>" min="50">
             </div>
             <div class="form-group">
                 <label>Height (px)</label>
-                <input type="number" name="thumb_height" class="form-input" value="<?= (int) $settings->get('thumb_height', 150) ?>" min="50">
+                <input type="number" name="thumbnail_height" class="form-input" value="<?= (int) $settings->get('thumbnail_height', 150) ?>" min="50">
             </div>
         </div>
 

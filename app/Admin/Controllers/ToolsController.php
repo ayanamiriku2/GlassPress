@@ -138,7 +138,7 @@ class ToolsController extends AdminController
         $cache->flush();
 
         // Also clear any compiled views if they exist
-        $cacheDir = GP_ROOT . '/cache';
+        $cacheDir = GLASSPRESS_ROOT . '/cache';
         if (is_dir($cacheDir)) {
             $files = glob($cacheDir . '/*.php');
             if ($files) {

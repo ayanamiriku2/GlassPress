@@ -17,7 +17,7 @@ $tabs = ['general' => 'General', 'writing' => 'Writing', 'reading' => 'Reading',
             <label>Default Post Category</label>
             <select name="default_category" class="form-input">
                 <?php
-                $db = $GLOBALS['app']->getService('db');
+                $db = $app->getService('db');
                 $cats = $db->fetchAll(sprintf("SELECT * FROM %s WHERE taxonomy = 'category' ORDER BY name", $db->prefix('taxonomies')));
                 $defaultCat = $settings->get('default_category', '1');
                 foreach ($cats as $cat):

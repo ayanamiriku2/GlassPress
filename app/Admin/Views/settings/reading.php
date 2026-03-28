@@ -14,8 +14,8 @@
 
         <div class="form-group">
             <label>Homepage Display</label>
-            <select name="homepage_display" class="form-input">
-                <?php $hd = $settings->get('homepage_display', 'posts'); ?>
+            <select name="homepage_type" class="form-input">
+                <?php $hd = $settings->get('homepage_type', 'posts'); ?>
                 <option value="posts" <?= $hd === 'posts' ? 'selected' : '' ?>>Latest posts</option>
                 <option value="page" <?= $hd === 'page' ? 'selected' : '' ?>>Static page</option>
             </select>
@@ -23,7 +23,7 @@
 
         <div class="form-group">
             <label>Static Homepage (page ID, if applicable)</label>
-            <input type="number" name="homepage_page_id" class="form-input" value="<?= $settings->get('homepage_page_id', '') ?>">
+            <input type="number" name="homepage_id" class="form-input" value="<?= $settings->get('homepage_id', '') ?>">
         </div>
 
         <div class="form-group">

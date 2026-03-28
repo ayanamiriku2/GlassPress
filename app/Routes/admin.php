@@ -107,7 +107,7 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth', 'csrf']], function
     $router->get('/settings/seo', 'GlassPress\App\Admin\Controllers\SettingsController@seo', 'admin.settings.seo');
     $router->get('/settings/redirects', 'GlassPress\App\Admin\Controllers\SettingsController@redirects', 'admin.settings.redirects');
     $router->post('/settings/redirects/store', 'GlassPress\App\Admin\Controllers\SettingsController@storeRedirect', 'admin.settings.redirects.store');
-    $router->get('/settings/redirects/delete/{id}', 'GlassPress\App\Admin\Controllers\SettingsController@deleteRedirect', 'admin.settings.redirects.delete');
+    $router->post('/settings/redirects/delete/{id}', 'GlassPress\App\Admin\Controllers\SettingsController@deleteRedirect', 'admin.settings.redirects.delete');
     $router->get('/settings/appearance', 'GlassPress\App\Admin\Controllers\SettingsController@appearance', 'admin.settings.appearance');
     $router->get('/settings/advanced', 'GlassPress\App\Admin\Controllers\SettingsController@advanced', 'admin.settings.advanced');
 

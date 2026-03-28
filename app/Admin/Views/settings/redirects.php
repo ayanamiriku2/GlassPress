@@ -51,7 +51,10 @@
                 <td><?= (int) ($r['hit_count'] ?? 0) ?></td>
                 <td><?= date('M j, Y', strtotime($r['created_at'])) ?></td>
                 <td>
-                    <a href="<?= $adminUrl ?>/settings/redirects/delete/<?= $r['id'] ?>" class="text-danger confirm-delete">Delete</a>
+                    <form method="POST" action="<?= $app->getAdminUrl('settings/redirects/delete/' . $r['id']) ?>" style="display:inline" onsubmit="return confirm('Delete this redirect?')">
+                        <?= \GlassPress\Core\CSRF::field() ?>
+                        <button type="submit" class="btn-link text-danger">Delete</button>
+                    </form>
                 </td>
             </tr>
             <?php endforeach; endif; ?>

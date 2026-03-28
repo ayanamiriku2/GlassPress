@@ -9,12 +9,12 @@
 
         <div class="form-group">
             <label>Homepage Meta Title</label>
-            <input type="text" name="seo_home_title" class="form-input" maxlength="70" value="<?= htmlspecialchars($settings->get('seo_home_title', '')) ?>" placeholder="Site Title - Tagline">
+            <input type="text" name="seo_homepage_title" class="form-input" maxlength="70" value="<?= htmlspecialchars($settings->get('seo_homepage_title', '')) ?>" placeholder="Site Title - Tagline">
         </div>
 
         <div class="form-group">
             <label>Homepage Meta Description</label>
-            <textarea name="seo_home_description" rows="2" class="form-input" maxlength="160"><?= htmlspecialchars($settings->get('seo_home_description', '')) ?></textarea>
+            <textarea name="seo_homepage_description" rows="2" class="form-input" maxlength="160"><?= htmlspecialchars($settings->get('seo_homepage_description', '')) ?></textarea>
         </div>
 
         <div class="form-group">

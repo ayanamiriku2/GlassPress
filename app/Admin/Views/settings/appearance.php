@@ -59,14 +59,36 @@
         <h3 class="card-title">Branding</h3>
 
         <div class="form-group">
-            <label class="form-label">Logo URL</label>
-            <input type="text" name="site_logo" class="form-input" value="<?= htmlspecialchars($settings['site_logo'] ?? '') ?>" placeholder="/uploads/logo.png">
+            <label class="form-label">Logo</label>
+            <div class="media-field">
+                <input type="hidden" name="site_logo" id="site-logo-url" value="<?= htmlspecialchars($settings['site_logo'] ?? '') ?>">
+                <div class="media-field-preview" id="site-logo-preview">
+                    <?php if (!empty($settings['site_logo'])): ?>
+                    <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="Logo">
+                    <?php endif; ?>
+                </div>
+                <div class="media-field-actions">
+                    <button type="button" class="btn btn-sm" onclick="openMediaField('site-logo')">Browse</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="site-logo-remove" onclick="clearMediaField('site-logo')" style="<?= empty($settings['site_logo']) ? 'display:none' : '' ?>">Remove</button>
+                </div>
+            </div>
             <p class="form-hint">Leave empty to use the site title as text.</p>
         </div>
 
         <div class="form-group">
-            <label class="form-label">Favicon URL</label>
-            <input type="text" name="site_favicon" class="form-input" value="<?= htmlspecialchars($settings['site_favicon'] ?? '') ?>" placeholder="/uploads/favicon.ico">
+            <label class="form-label">Favicon</label>
+            <div class="media-field">
+                <input type="hidden" name="site_favicon" id="site-favicon-url" value="<?= htmlspecialchars($settings['site_favicon'] ?? '') ?>">
+                <div class="media-field-preview" id="site-favicon-preview">
+                    <?php if (!empty($settings['site_favicon'])): ?>
+                    <img src="<?= htmlspecialchars($settings['site_favicon']) ?>" alt="Favicon">
+                    <?php endif; ?>
+                </div>
+                <div class="media-field-actions">
+                    <button type="button" class="btn btn-sm" onclick="openMediaField('site-favicon')">Browse</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="site-favicon-remove" onclick="clearMediaField('site-favicon')" style="<?= empty($settings['site_favicon']) ? 'display:none' : '' ?>">Remove</button>
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
@@ -104,4 +126,25 @@
 
 <style>
 .settings-tabs{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap}.settings-tab{padding:8px 16px;border-radius:8px 8px 0 0;color:var(--text-muted);text-decoration:none;font-size:14px;transition:all .2s;border:1px solid transparent;border-bottom:none}.settings-tab:hover{color:var(--text);background:var(--glass-bg)}.settings-tab.active{color:var(--text);background:var(--glass-bg);border-color:var(--glass-border);font-weight:600}
+.media-field{display:flex;align-items:center;gap:12px}
+.media-field-preview{width:80px;height:80px;border:2px dashed var(--glass-border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--glass-bg)}
+.media-field-preview img{max-width:100%;max-height:100%;object-fit:contain}
+.media-field-actions{display:flex;gap:6px;flex-direction:column}
 </style>
+
+<script>
+function openMediaField(fieldId) {
+    if (typeof gpMedia === 'undefined') return;
+    gpMedia.open('settings-' + fieldId, function(media) {
+        document.getElementById(fieldId + '-url').value = media.file_path;
+        var preview = document.getElementById(fieldId + '-preview');
+        preview.innerHTML = '<img src="' + media.file_path + '" alt="">';
+        document.getElementById(fieldId + '-remove').style.display = '';
+    });
+}
+function clearMediaField(fieldId) {
+    document.getElementById(fieldId + '-url').value = '';
+    document.getElementById(fieldId + '-preview').innerHTML = '';
+    document.getElementById(fieldId + '-remove').style.display = 'none';
+}
+</script>

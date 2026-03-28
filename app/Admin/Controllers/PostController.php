@@ -129,7 +129,9 @@ class PostController extends AdminController
             $status = 'pending';
         }
 
-        $postId = $db->insert('posts', [
+        $db->beginTransaction();
+        try {
+            $postId = $db->insert('posts', [
             'author_id' => $authorId,
             'title' => $title,
             'slug' => $slug,
@@ -162,7 +164,13 @@ class PostController extends AdminController
         // Create initial revision
         $this->createRevision($db, $postId, $title, $content, $excerpt, $auth->userId());
 
-        $target = $postType === 'page' ? '/admin/pages' : '/admin/posts';
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $this->redirect($this->app->getAdminUrl('posts'), 'Failed to create post: ' . $e->getMessage(), 'error');
+            return;
+        }
+
         $this->redirect($this->app->getAdminUrl("posts/edit/{$postId}"), 'Post created successfully.');
     }
 
@@ -278,7 +286,9 @@ class PostController extends AdminController
             $this->createSlugRedirect($db, $post);
         }
 
-        $db->update('posts', [
+        $db->beginTransaction();
+        try {
+            $db->update('posts', [
             'title' => $title,
             'slug' => $slug,
             'content' => $content,
@@ -309,6 +319,13 @@ class PostController extends AdminController
         // Create revision
         $this->createRevision($db, $postId, $title, $content, $excerpt, $auth->userId());
 
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $this->redirect($this->app->getAdminUrl("posts/edit/{$postId}"), 'Failed to update post: ' . $e->getMessage(), 'error');
+            return;
+        }
+
         $this->redirect($this->app->getAdminUrl("posts/edit/{$postId}"), 'Post updated successfully.');
     }
 
@@ -329,11 +346,19 @@ class PostController extends AdminController
 
         if ($post['status'] === 'trash') {
             // Permanent delete
-            $db->delete('post_taxonomy', 'post_id = ?', [$postId]);
-            $db->delete('post_revisions', 'post_id = ?', [$postId]);
-            $db->delete('comments', 'post_id = ?', [$postId]);
-            $db->delete('seo_meta', "object_type = 'post' AND object_id = ?", [$postId]);
-            $db->delete('posts', 'id = ?', [$postId]);
+            $db->beginTransaction();
+            try {
+                $db->delete('post_taxonomy', 'post_id = ?', [$postId]);
+                $db->delete('post_revisions', 'post_id = ?', [$postId]);
+                $db->delete('comments', 'post_id = ?', [$postId]);
+                $db->delete('seo_meta', "object_type = 'post' AND object_id = ?", [$postId]);
+                $db->delete('posts', 'id = ?', [$postId]);
+                $db->commit();
+            } catch (\Exception $e) {
+                $db->rollBack();
+                $this->redirect($this->app->getAdminUrl('posts?status=trash'), 'Failed to delete post.', 'error');
+                return;
+            }
             $this->redirect($this->app->getAdminUrl('posts?status=trash'), 'Post permanently deleted.');
         } else {
             // Move to trash
@@ -637,12 +662,14 @@ class PostController extends AdminController
         $settings = $this->app->getService('settings');
         $structure = $settings->get('permalink_structure', '/{slug}');
         $oldUrl = str_replace('{slug}', $post['slug'], $structure);
+        $newSlug = trim($_POST['slug'] ?? '') ?: $post['slug'];
+        $newUrl = str_replace('{slug}', $newSlug, $structure);
 
         // Check if redirect already exists
-        if (!$db->exists('redirects', 'source_url = ?', [$oldUrl])) {
+        if ($oldUrl !== $newUrl && !$db->exists('redirects', 'source_url = ?', [$oldUrl])) {
             $db->insert('redirects', [
                 'source_url' => $oldUrl,
-                'target_url' => str_replace('{slug}', '', $structure), // Will need to update after slug is set
+                'target_url' => $newUrl,
                 'status_code' => 301,
                 'is_active' => 1,
                 'created_at' => date('Y-m-d H:i:s'),

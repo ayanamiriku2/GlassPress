@@ -3,7 +3,7 @@
 <div class="page-header">
     <h1>Dashboard</h1>
     <div class="page-header-actions">
-        <a href="/admin/posts/create" class="btn btn-primary">+ New Post</a>
+        <a href="<?= $app->getAdminUrl('posts/create') ?>" class="btn btn-primary">+ New Post</a>
     </div>
 </div>
 
@@ -35,18 +35,18 @@
     <div class="glass-card">
         <div class="glass-card-header">
             <h2>Recent Posts</h2>
-            <a href="/admin/posts" class="btn btn-sm btn-secondary">View All</a>
+            <a href="<?= $app->getAdminUrl('posts') ?>" class="btn btn-sm btn-secondary">View All</a>
         </div>
         <?php if (empty($recentPosts)): ?>
         <div class="empty-state">
-            <p>No posts yet. <a href="/admin/posts/create">Create your first post</a></p>
+            <p>No posts yet. <a href="<?= $app->getAdminUrl('posts/create') ?>">Create your first post</a></p>
         </div>
         <?php else: ?>
         <ul class="widget-list">
             <?php foreach ($recentPosts as $post): ?>
             <li>
                 <div>
-                    <a href="/admin/posts/edit/<?= $post['id'] ?>" style="color:var(--text-bright);font-weight:500;"><?= htmlspecialchars($post['title'] ?: '(Untitled)') ?></a>
+                    <a href="<?= $app->getAdminUrl('posts/edit/' . $post['id']) ?>" style="color:var(--text-bright);font-weight:500;"><?= htmlspecialchars($post['title'] ?: '(Untitled)') ?></a>
                     <div class="text-xs text-muted"><?= date('M j, Y', strtotime($post['created_at'])) ?> by <?= htmlspecialchars($post['author_name'] ?? 'Unknown') ?></div>
                 </div>
                 <span class="badge badge-<?= $post['status'] ?>"><?= ucfirst($post['status']) ?></span>
@@ -63,7 +63,7 @@
             <div class="glass-card-header">
                 <h2>Quick Draft</h2>
             </div>
-            <form method="POST" action="/admin/posts/store">
+            <form method="POST" action="<?= $app->getAdminUrl('posts/store') ?>">
                 <?= $csrf_field ?>
                 <input type="hidden" name="post_type" value="post">
                 <input type="hidden" name="status" value="draft">

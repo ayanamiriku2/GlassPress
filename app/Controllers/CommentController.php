@@ -80,7 +80,7 @@ class CommentController
 
         $db->insert('comments', [
             'post_id' => $postId,
-            'parent_id' => $parentId ?: 0,
+            'parent_id' => $parentId ?: null,
             'author_name' => htmlspecialchars(mb_substr($name, 0, 100), ENT_QUOTES, 'UTF-8'),
             'author_email' => $email,
             'author_ip' => $_SERVER['REMOTE_ADDR'] ?? '',

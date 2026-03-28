@@ -26,7 +26,7 @@ class MenuController extends AdminController
 
         // Get pages and categories for adding to menus
         $pages = $db->fetchAll(sprintf(
-            "SELECT id, title FROM %s WHERE post_type = 'page' AND status = 'published' ORDER BY title",
+            "SELECT id, title FROM %s WHERE post_type = 'page' AND status = 'publish' ORDER BY title",
             $db->prefix('posts')
         ));
 
@@ -58,9 +58,13 @@ class MenuController extends AdminController
             return;
         }
 
+        $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $name));
+
         $menuId = $db->insert('menus', [
             'name' => $name,
+            'slug' => $slug,
             'location' => $location,
+            'created_at' => date('Y-m-d H:i:s'),
         ]);
 
         $this->redirect($this->app->getAdminUrl("menus?menu={$menuId}"), 'Menu created.');
@@ -97,9 +101,9 @@ class MenuController extends AdminController
                 'menu_id' => $menuId,
                 'title' => $title,
                 'url' => trim($urls[$i] ?? '#'),
-                'type' => $types[$i] ?? 'custom',
+                'item_type' => $types[$i] ?? 'custom',
                 'object_id' => (int) ($objectIds[$i] ?? 0) ?: null,
-                'parent_id' => null, // Simplified - no nesting in this update
+                'parent_id' => null,
                 'sort_order' => $i,
                 'target' => ($targets[$i] ?? '') === '_blank' ? '_blank' : '',
                 'css_class' => '',
@@ -115,8 +119,16 @@ class MenuController extends AdminController
         $db = $this->app->getService('db');
         $menuId = (int) $id;
 
-        $db->delete('menu_items', 'menu_id = ?', [$menuId]);
-        $db->delete('menus', 'id = ?', [$menuId]);
+        $db->beginTransaction();
+        try {
+            $db->delete('menu_items', 'menu_id = ?', [$menuId]);
+            $db->delete('menus', 'id = ?', [$menuId]);
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $this->redirect($this->app->getAdminUrl('menus'), 'Failed to delete menu.', 'error');
+            return;
+        }
 
         $this->redirect($this->app->getAdminUrl('menus'), 'Menu deleted.');
     }

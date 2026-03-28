@@ -3,7 +3,8 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
+    # If installed in a subfolder, change this to match (e.g. /mysite/)
+    # RewriteBase /
 
     # Force HTTPS (uncomment if SSL available)
     # RewriteCond %{HTTPS} off

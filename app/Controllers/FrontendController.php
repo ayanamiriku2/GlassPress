@@ -584,8 +584,8 @@ class FrontendController
         }
 
         // Description
-        if (isset($data['post']['seo']['meta_description']) && $data['post']['seo']['meta_description']) {
-            $seo['description'] = $data['post']['seo']['meta_description'];
+        if (isset($data['post']['seo']['seo_description']) && $data['post']['seo']['seo_description']) {
+            $seo['description'] = $data['post']['seo']['seo_description'];
         } elseif (isset($data['post']['excerpt']) && $data['post']['excerpt']) {
             $seo['description'] = mb_substr(strip_tags($data['post']['excerpt']), 0, 160);
         } else {
@@ -707,7 +707,8 @@ class FrontendController
     {
         $tree = [];
         foreach ($comments as $comment) {
-            if ((int) $comment['parent_id'] === $parentId) {
+            $commentParent = (int) ($comment['parent_id'] ?? 0);
+            if ($commentParent === $parentId) {
                 $comment['children'] = $this->buildCommentTree($comments, (int) $comment['id']);
                 $tree[] = $comment;
             }

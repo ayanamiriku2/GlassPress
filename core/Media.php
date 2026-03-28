@@ -44,7 +44,9 @@ class Media
         $this->db = $db;
         $this->config = $config;
         $this->uploadDir = GLASSPRESS_ROOT . '/uploads';
-        $this->uploadUrl = '/uploads';
+        // Compute subfolder-safe upload URL
+        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+        $this->uploadUrl = $basePath . '/uploads';
     }
 
     /**

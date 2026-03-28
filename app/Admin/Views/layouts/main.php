@@ -6,7 +6,14 @@
     <meta name="robots" content="noindex, nofollow">
     <?= \GlassPress\Core\CSRF::meta() ?>
     <title><?= htmlspecialchars($pageTitle ?? 'Admin') ?> - <?= htmlspecialchars($siteName) ?></title>
-    <link rel="stylesheet" href="/public/assets/css/admin.css">
+    <?php $favicon = $settings->get('site_favicon', ''); if ($favicon):
+        $favExt = strtolower(pathinfo($favicon, PATHINFO_EXTENSION));
+        $favType = match($favExt) { 'png' => 'image/png', 'svg' => 'image/svg+xml', 'gif' => 'image/gif', 'jpg', 'jpeg' => 'image/jpeg', 'webp' => 'image/webp', default => 'image/x-icon' };
+    ?>
+    <link rel="icon" type="<?= $favType ?>" href="<?= htmlspecialchars($favicon) ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($favicon) ?>">
+    <?php endif; ?>
+    <link rel="stylesheet" href="<?= $app->getAssetUrl('css/admin.css') ?>">
 </head>
 <body class="admin-body">
     <!-- Top Toolbar -->
@@ -15,7 +22,7 @@
             <button class="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-collapsed')" title="Toggle Sidebar">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
             </button>
-            <a href="/" class="toolbar-site-link" target="_blank" title="View Site">
+            <a href="<?= $app->getBasePath() ?: '/' ?>" class="toolbar-site-link" target="_blank" title="View Site">
                 <?= htmlspecialchars($siteName) ?>
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
             </a>
@@ -24,8 +31,8 @@
             <div class="toolbar-user">
                 <span class="user-avatar"><?= strtoupper(substr($user['display_name'] ?? $user['username'], 0, 1)) ?></span>
                 <div class="user-dropdown">
-                    <a href="/admin/profile">Profile</a>
-                    <a href="/admin/logout">Sign Out</a>
+                    <a href="<?= $app->getAdminUrl('profile') ?>">Profile</a>
+                    <a href="<?= $app->getAdminUrl('logout') ?>">Sign Out</a>
                 </div>
             </div>
         </div>
@@ -34,7 +41,7 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar">
         <div class="sidebar-logo">
-            <a href="/admin">
+            <a href="<?= $app->getAdminUrl() ?>">
                 <span class="logo-icon">&#9670;</span>
                 <span class="logo-text">GlassPress</span>
             </a>
@@ -43,39 +50,40 @@
         <nav class="sidebar-nav">
             <?php
             $uri = $currentUri ?? '';
+            $au = function(string $p = '') use ($app) { return $app->getAdminUrl($p); };
             $menuItems = [
-                ['url' => '/admin', 'icon' => 'dashboard', 'label' => 'Dashboard', 'match' => '/admin$'],
-                ['url' => '/admin/posts', 'icon' => 'posts', 'label' => 'Posts', 'match' => '/admin/posts', 'children' => [
-                    ['url' => '/admin/posts', 'label' => 'All Posts'],
-                    ['url' => '/admin/posts/create', 'label' => 'Add New'],
-                    ['url' => '/admin/categories', 'label' => 'Categories'],
-                    ['url' => '/admin/tags', 'label' => 'Tags'],
+                ['url' => $au(), 'icon' => 'dashboard', 'label' => 'Dashboard', 'match' => '/admin$'],
+                ['url' => $au('posts'), 'icon' => 'posts', 'label' => 'Posts', 'match' => '/admin/posts', 'children' => [
+                    ['url' => $au('posts'), 'label' => 'All Posts'],
+                    ['url' => $au('posts/create'), 'label' => 'Add New'],
+                    ['url' => $au('categories'), 'label' => 'Categories'],
+                    ['url' => $au('tags'), 'label' => 'Tags'],
                 ]],
-                ['url' => '/admin/media', 'icon' => 'media', 'label' => 'Media', 'match' => '/admin/media'],
-                ['url' => '/admin/pages', 'icon' => 'pages', 'label' => 'Pages', 'match' => '/admin/pages', 'children' => [
-                    ['url' => '/admin/pages', 'label' => 'All Pages'],
-                    ['url' => '/admin/pages/create', 'label' => 'Add New'],
+                ['url' => $au('media'), 'icon' => 'media', 'label' => 'Media', 'match' => '/admin/media'],
+                ['url' => $au('pages'), 'icon' => 'pages', 'label' => 'Pages', 'match' => '/admin/pages', 'children' => [
+                    ['url' => $au('pages'), 'label' => 'All Pages'],
+                    ['url' => $au('pages/create'), 'label' => 'Add New'],
                 ]],
-                ['url' => '/admin/comments', 'icon' => 'comments', 'label' => 'Comments', 'match' => '/admin/comments', 'badge' => $pendingComments > 0 ? $pendingComments : null],
-                ['url' => '/admin/menus', 'icon' => 'menus', 'label' => 'Menus', 'match' => '/admin/menus'],
-                ['url' => '/admin/users', 'icon' => 'users', 'label' => 'Users', 'match' => '/admin/users'],
-                ['url' => '/admin/settings', 'icon' => 'settings', 'label' => 'Settings', 'match' => '/admin/settings', 'children' => [
-                    ['url' => '/admin/settings/general', 'label' => 'General'],
-                    ['url' => '/admin/settings/writing', 'label' => 'Writing'],
-                    ['url' => '/admin/settings/reading', 'label' => 'Reading'],
-                    ['url' => '/admin/settings/discussion', 'label' => 'Discussion'],
-                    ['url' => '/admin/settings/media', 'label' => 'Media'],
-                    ['url' => '/admin/settings/permalinks', 'label' => 'Permalinks'],
-                    ['url' => '/admin/settings/seo', 'label' => 'SEO'],
-                    ['url' => '/admin/settings/redirects', 'label' => 'Redirects'],
-                    ['url' => '/admin/settings/appearance', 'label' => 'Appearance'],
-                    ['url' => '/admin/settings/advanced', 'label' => 'Advanced'],
+                ['url' => $au('comments'), 'icon' => 'comments', 'label' => 'Comments', 'match' => '/admin/comments', 'badge' => $pendingComments > 0 ? $pendingComments : null],
+                ['url' => $au('menus'), 'icon' => 'menus', 'label' => 'Menus', 'match' => '/admin/menus'],
+                ['url' => $au('users'), 'icon' => 'users', 'label' => 'Users', 'match' => '/admin/users'],
+                ['url' => $au('settings'), 'icon' => 'settings', 'label' => 'Settings', 'match' => '/admin/settings', 'children' => [
+                    ['url' => $au('settings/general'), 'label' => 'General'],
+                    ['url' => $au('settings/writing'), 'label' => 'Writing'],
+                    ['url' => $au('settings/reading'), 'label' => 'Reading'],
+                    ['url' => $au('settings/discussion'), 'label' => 'Discussion'],
+                    ['url' => $au('settings/media'), 'label' => 'Media'],
+                    ['url' => $au('settings/permalinks'), 'label' => 'Permalinks'],
+                    ['url' => $au('settings/seo'), 'label' => 'SEO'],
+                    ['url' => $au('settings/redirects'), 'label' => 'Redirects'],
+                    ['url' => $au('settings/appearance'), 'label' => 'Appearance'],
+                    ['url' => $au('settings/advanced'), 'label' => 'Advanced'],
                 ]],
-                ['url' => '/admin/tools', 'icon' => 'tools', 'label' => 'Tools', 'match' => '/admin/tools', 'children' => [
-                    ['url' => '/admin/tools', 'label' => 'Overview'],
-                    ['url' => '/admin/tools/seo-health', 'label' => 'SEO Health'],
-                    ['url' => '/admin/tools/404-log', 'label' => '404 Log'],
-                    ['url' => '/admin/tools/system-info', 'label' => 'System Info'],
+                ['url' => $au('tools'), 'icon' => 'tools', 'label' => 'Tools', 'match' => '/admin/tools', 'children' => [
+                    ['url' => $au('tools'), 'label' => 'Overview'],
+                    ['url' => $au('tools/seo-health'), 'label' => 'SEO Health'],
+                    ['url' => $au('tools/404-log'), 'label' => '404 Log'],
+                    ['url' => $au('tools/system-info'), 'label' => 'System Info'],
                 ]],
             ];
 
@@ -133,7 +141,8 @@
         <?= \GlassPress\Core\View::yieldSection('content') ?>
     </main>
 
-    <script src="/public/assets/js/admin.js"></script>
+    <script>window.GP_BASE_PATH = <?= json_encode($app->getBasePath()) ?>;</script>
+    <script src="<?= $app->getAssetUrl('js/admin.js') ?>"></script>
 
     <!-- Media Library Modal -->
     <div class="modal-overlay" id="media-modal">
@@ -174,7 +183,7 @@
             </div>
         </div>
     </div>
-    <script src="/public/assets/js/media-modal.js"></script>
+    <script src="<?= $app->getAssetUrl('js/media-modal.js') ?>"></script>
 
     <?php if (isset($scripts)): ?>
     <?php foreach ((array)$scripts as $script): ?>

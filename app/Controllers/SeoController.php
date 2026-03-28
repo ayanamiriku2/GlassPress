@@ -14,16 +14,22 @@ class SeoController
 
     public function robotsTxt(): void
     {
+        $settings = $this->app->getService('settings');
         $siteUrl = $this->app->getSiteUrl();
         header('Content-Type: text/plain');
 
-        echo "User-agent: *\n";
-        echo "Allow: /\n";
-        echo "Disallow: /admin/\n";
-        echo "Disallow: /storage/\n";
-        echo "Disallow: /config/\n";
-        echo "Disallow: /core/\n\n";
-        echo "Sitemap: {$siteUrl}/sitemap.xml\n";
+        $customRobots = $settings->get('robots_txt', '');
+        if ($customRobots) {
+            echo $customRobots;
+        } else {
+            echo "User-agent: *\n";
+            echo "Allow: /\n";
+            echo "Disallow: /admin/\n";
+            echo "Disallow: /storage/\n";
+            echo "Disallow: /config/\n";
+            echo "Disallow: /core/\n\n";
+            echo "Sitemap: {$siteUrl}/sitemap.xml\n";
+        }
         exit;
     }
 }

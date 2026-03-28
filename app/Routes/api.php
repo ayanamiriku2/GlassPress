@@ -16,7 +16,7 @@ $router->group(['prefix' => 'api', 'middleware' => ['auth']], function ($router)
     $router->post('/posts/autosave', 'GlassPress\App\Admin\Controllers\PostController@apiAutosave', 'api.posts.autosave');
 
     // Slug generation
-    $router->get('/slug', 'GlassPress\App\Admin\Controllers\PostController@generateSlug', 'api.slug');
+    $router->get('/slug', 'GlassPress\App\Admin\Controllers\PostController@generateSlugApi', 'api.slug');
     
     // Link checker
     $router->post('/check-links', 'GlassPress\App\Admin\Controllers\ToolsController@checkLinks', 'api.check_links');
