@@ -1,0 +1,23 @@
+# Config (contains database credentials)
+config/app.php
+
+# Uploads
+uploads/
+
+# Storage logs & cache
+storage/logs/*.log
+storage/cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+vendor/
+node_modules/
